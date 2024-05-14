@@ -55,8 +55,8 @@ class HelpScout(object):
         response = self.s.get(url)
         article = response.json().get('article')
         if article is None:
-            print response.status_code
-            print response.json()
+            print(response.status_code)
+            print(response.json())
         article['collection'] = self.collections[article['collectionId']]
         article['categories'] = map(lambda c: self.categories[c]['slug'], article['categories'])
         return article
@@ -73,10 +73,18 @@ def html_to_markdown(html):
 
 def markdown_from_article(article):
     body = html_to_markdown(article['text'])
+    
+    # Get the keywords if available, or set an empty list if not present
+    keywords = article.get('keywords', [])
+    
+    # Split the categories string into a list
+    categories_list = article['categories'].split(',') if isinstance(article['categories'], str) else []
+    # Process each category
+    categories = [category.strip() for category in categories_list]
     metadata = {
         'collection': article['collection']['slug'],
-        'categories': article['categories'],
-        'keywords': article['keywords'],
+        'categories': categories,
+        'keywords': keywords,
         'name': article['name'],
         'helpscout_url': article['publicUrl'],
         'slug': article['slug'],
